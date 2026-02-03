@@ -1,10 +1,115 @@
 <html lang="es"><head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Cronograma de Devocionales de Alabanza</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&amp;family=Work+Sans:wght@300;400;600&amp;display=swap" rel="stylesheet">
+    <script>
+        // Variables globales simples
+        let currentWeekFilter = 'all';
+
+        // Función de filtro simple y efectiva
+        function setActiveFilter(week) {
+            currentWeekFilter = week;
+            
+            // Actualizar botones activos
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                if (btn.dataset.week === week) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Aplicar filtro
+            filterContent();
+        }
+
+        // Función de filtrado de contenido
+        function filterContent() {
+            const searchInput = document.getElementById('searchInput');
+            const content = document.getElementById('content');
+            const noResults = document.getElementById('noResults');
+
+            if (!searchInput || !content || !noResults) return;
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const weekSections = document.querySelectorAll('.week-section');
+            let hasVisibleContent = false;
+
+            weekSections.forEach(section => {
+                const weekNum = section.dataset.week;
+                let sectionHasVisible = false;
+
+                // Filtro por semana
+                if (currentWeekFilter !== 'all' && weekNum !== currentWeekFilter) {
+                    section.classList.add('hidden');
+                    return;
+                } else {
+                    section.classList.remove('hidden');
+                }
+
+                // Filtro por búsqueda de texto
+                const dayCards = section.querySelectorAll('.day-card');
+                dayCards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    if (searchTerm === '' || text.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        sectionHasVisible = true;
+                        hasVisibleContent = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Ocultar sección si no hay contenido visible
+                if (!sectionHasVisible) {
+                    section.classList.add('hidden');
+                }
+            });
+
+            // Mostrar mensaje de no resultados si es necesario
+            if (hasVisibleContent) {
+                content.classList.remove('hidden');
+                noResults.classList.add('hidden');
+            } else {
+                content.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            }
+        }
+
+
+
+        // Inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar eventos de búsqueda
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterContent);
+                searchInput.addEventListener('keyup', filterContent);
+                searchInput.addEventListener('change', filterContent);
+            }
+
+            // Mostrar todas las semanas al inicio
+            const allSections = document.querySelectorAll('.week-section');
+            allSections.forEach(section => {
+                section.classList.remove('hidden');
+            });
+
+            // Aplicar filtro inicial
+            filterContent();
+        });
+
+        // Backup para navegadores que no soportan DOMContentLoaded
+        window.addEventListener('load', function() {
+            const allSections = document.querySelectorAll('.week-section');
+            allSections.forEach(section => {
+                section.classList.remove('hidden');
+            });
+            filterContent();
+        });
+    </script>
     <style>
         * {
             margin: 0;
@@ -304,38 +409,7 @@
             font-size: 1.2rem;
         }
 
-        .download-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
-            color: white;
-            padding: 16px 32px;
-            border-radius: 50px;
-            border: none;
-            font-family: 'Work Sans', sans-serif;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-height: 44px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
 
-        .download-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .download-btn:active {
-            transform: translateY(-1px) scale(1.02);
-        }
 
         @media (max-width: 768px) {
             body {
@@ -391,14 +465,7 @@
                 padding: 20px;
             }
 
-            .download-btn {
-                bottom: 15px;
-                right: 15px;
-                left: 15px;
-                padding: 14px 20px;
-                font-size: 14px;
-                justify-content: center;
-            }
+
         }
 
         @media (max-width: 480px) {
@@ -442,11 +509,7 @@
                 padding: 7px 10px;
             }
 
-            .download-btn {
-                font-size: 13px;
-                padding: 12px 16px;
-                gap: 8px;
-            }
+
         }
 
         @media (max-width: 360px) {
@@ -463,9 +526,7 @@
                 padding: 8px 12px;
             }
 
-            .download-btn span:last-child {
-                font-size: 12px;
-            }
+
         }
 
         .hidden {
@@ -484,8 +545,7 @@
                 padding: 20px;
             }
 
-            .controls,
-            .download-btn {
+            .controls {
                 display: none;
             }
 
@@ -505,16 +565,17 @@
 
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar por nombre...">
+                <input type="text" id="searchInput" placeholder="Buscar por nombre..." oninput="filterContent()" onkeyup="filterContent()" onchange="filterContent()">
                 <span class="search-icon">🔍</span>
             </div>
             <div class="filter-buttons">
-                <button class="filter-btn" data-week="all">Todas las semanas</button>
-                <button class="filter-btn active" data-week="1">Semana 1</button>
-                <button class="filter-btn" data-week="2">Semana 2</button>
-                <button class="filter-btn" data-week="3">Semana 3</button>
-                <button class="filter-btn" data-week="4">Semana 4</button>
+                <button class="filter-btn active" data-week="all" onclick="setActiveFilter('all')">Todas las semanas</button>
+                <button class="filter-btn" data-week="1" onclick="setActiveFilter('1')">Semana 1</button>
+                <button class="filter-btn" data-week="2" onclick="setActiveFilter('2')">Semana 2</button>
+                <button class="filter-btn" data-week="3" onclick="setActiveFilter('3')">Semana 3</button>
+                <button class="filter-btn" data-week="4" onclick="setActiveFilter('4')">Semana 4</button>
             </div>
+
         </div>
 
         <div id="content" class="">
@@ -832,115 +893,15 @@
         </div>
     </div>
 
-    <button class="download-btn" onclick="downloadHTML()">
-        <span>📥</span>
-        <span>Descargar para WhatsApp</span>
-    </button>
 
-    <script>
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        const content = document.getElementById('content');
-        const noResults = document.getElementById('noResults');
-        let currentWeekFilter = 'all';
 
-        searchInput.addEventListener('input', function(e) {
-            filterContent();
-        });
-
-        // Week filter buttons
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentWeekFilter = this.dataset.week;
-                filterContent();
-            });
-        });
-
-        function filterContent() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const weekSections = document.querySelectorAll('.week-section');
-            let hasVisibleContent = false;
-
-            weekSections.forEach(section => {
-                const weekNum = section.dataset.week;
-                let sectionHasVisible = false;
-
-                // Check week filter
-                if (currentWeekFilter !== 'all' && weekNum !== currentWeekFilter) {
-                    section.classList.add('hidden');
-                    return;
-                }
-
-                const dayCards = section.querySelectorAll('.day-card');
-                
-                dayCards.forEach(card => {
-                    const text = card.textContent.toLowerCase();
-                    if (searchTerm === '' || text.includes(searchTerm)) {
-                        card.style.display = 'block';
-                        sectionHasVisible = true;
-                        hasVisibleContent = true;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                if (sectionHasVisible) {
-                    section.classList.remove('hidden');
-                } else {
-                    section.classList.add('hidden');
-                }
-            });
-
-            if (hasVisibleContent) {
-                content.classList.remove('hidden');
-                noResults.classList.add('hidden');
-            } else {
-                content.classList.add('hidden');
-                noResults.classList.remove('hidden');
-            }
-        }
-
-        // Download functionality
-        function downloadHTML() {
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'cronograma_devocionales_alabanza.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Show success message
-            const btn = document.querySelector('.download-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span>✅</span><span>¡Descargado!</span>';
-            btn.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.background = 'linear-gradient(135deg, var(--accent), var(--accent-light))';
-            }, 2000);
-        }
-
-        // Add smooth scroll behavior
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
     </script>
+
+    <noscript>
+        <div style="position: fixed; top: 0; left: 0; right: 0; background: #ff6b6b; color: white; padding: 15px; text-align: center; z-index: 9999; font-family: Arial, sans-serif;">
+            <strong>⚠️ JavaScript está deshabilitado</strong><br>
+            Para usar los filtros de búsqueda, habilita JavaScript en tu navegador.
+        </div>
+    </noscript>
 
 </body></html>
