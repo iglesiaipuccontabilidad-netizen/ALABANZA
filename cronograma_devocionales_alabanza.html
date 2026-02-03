@@ -1,0 +1,946 @@
+<html lang="es"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Cronograma de Devocionales de Alabanza</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&amp;family=Work+Sans:wght@300;400;600&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #d97706;
+            --accent-light: #fbbf24;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--bg-main);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--primary);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 45px 14px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Work Sans', sans-serif;
+            transition: all 0.3s ease;
+            background: var(--bg-card);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 12px;
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(26, 54, 93, 0.1);
+        }
+
+        .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .week-section {
+            margin-bottom: 50px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .week-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .week-number {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: 20px;
+        }
+
+        .day-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-light);
+        }
+
+        .day-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .day-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .day-subtitle {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .participants {
+            margin-top: 15px;
+        }
+
+        .participant {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: var(--bg-main);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            border-left: 3px solid var(--accent-light);
+        }
+
+        .participant:hover {
+            background: linear-gradient(90deg, rgba(217, 119, 6, 0.1), transparent);
+            transform: translateX(5px);
+        }
+
+        .participant strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .download-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .download-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .header {
+                margin-bottom: 30px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .filter-btn {
+                font-size: 13px;
+                padding: 10px 18px;
+            }
+
+            .days-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .week-title {
+                font-size: 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .week-number {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+
+            .day-card {
+                padding: 20px;
+            }
+
+            .download-btn {
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                padding: 14px 20px;
+                font-size: 14px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .container {
+                padding: 15px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .week-section {
+                margin-bottom: 30px;
+            }
+
+            .filter-btn {
+                font-size: 12px;
+                padding: 10px 16px;
+                white-space: nowrap;
+            }
+
+            .day-card {
+                padding: 16px;
+            }
+
+            .day-name {
+                font-size: 1.2rem;
+            }
+
+            .participant {
+                font-size: 0.9rem;
+                padding: 7px 10px;
+            }
+
+            .download-btn {
+                font-size: 13px;
+                padding: 12px 16px;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .filter-btn {
+                font-size: 11px;
+                padding: 8px 12px;
+            }
+
+            .download-btn span:last-child {
+                font-size: 12px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+
+            .controls,
+            .download-btn {
+                display: none;
+            }
+
+            .day-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cronograma de Devocionales de Alabanza</h1>
+            <p class="subtitle">Febrero - Marzo 2026</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por nombre...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn" data-week="all">Todas las semanas</button>
+                <button class="filter-btn active" data-week="1">Semana 1</button>
+                <button class="filter-btn" data-week="2">Semana 2</button>
+                <button class="filter-btn" data-week="3">Semana 3</button>
+                <button class="filter-btn" data-week="4">Semana 4</button>
+            </div>
+        </div>
+
+        <div id="content" class="">
+            <!-- Semana 1 -->
+            <div class="week-section" data-week="1">
+                <h2 class="week-title">
+                    <span class="week-number">1</span>
+                    <span>Primera Semana (02-08 de Febrero)</span>
+                </h2>
+                <div class="days-grid">
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Martes</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Yolismar J.</strong></div>
+                            <div class="participant"><strong>Rosiris A.</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Jueves</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant"><strong>Rosiris A.</strong></div>
+                            <div class="participant"><strong>Hellen C.</strong></div>
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Emanuel A.</div>
+                            <div class="participant">Congas: Matew S.</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Sábado</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Diana P.</strong></div>
+                            <div class="participant"><strong>Dany C.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Hernan</div>
+                            <div class="participant">Caja: Efrain</div>
+                            <div class="participant">Congas: Matew</div>
+                            <div class="participant">Guacharaca: Jose</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo AM</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Fredy M.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                            <div class="participant"><strong>Yolismar J.</strong></div>
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Hernan</div>
+                            <div class="participant">Congas: Emanuel</div>
+                            <div class="participant">Guacharaca: Efrain</div>
+                            <div class="participant">Caja: Jeison B</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo PM</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Diana P.</strong></div>
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant"><strong>Maira L.</strong></div>
+                            <div class="participant"><strong>Otoniel T.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Hernan L</div>
+                            <div class="participant">Congas: Matew S.</div>
+                            <div class="participant">Guacharaca: Jose M.</div>
+                            <div class="participant">Caja: Jhonatan B.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semana 2 -->
+            <div class="week-section hidden" data-week="2">
+                <h2 class="week-title">
+                    <span class="week-number">2</span>
+                    <span>Segunda Semana (09-15 de Febrero)</span>
+                </h2>
+                <div class="days-grid">
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Martes</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Hellen C.</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Miércoles</div>
+                        <div class="day-subtitle">(Culto Gigante)</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Dany C.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Guacharaca: Emanuel</div>
+                            <div class="participant">Caja: Efrain J.</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Jueves</div>
+                        <div class="day-subtitle">(Culto Especial Intermedio)</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Yolismar J.</strong></div>
+                            <div class="participant"><strong>Yolismar J.</strong></div>
+                            <div class="participant"><strong>Fredy M.</strong></div>
+                            <div class="participant"><strong>Dany C.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Hernan L.</div>
+                            <div class="participant">Congas: Emanuel A.</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Sábado</div>
+                        <div class="day-subtitle">(Gavillas para Cristo)</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Fredy M.</strong></div>
+                            <div class="participant"><strong>Yolismar.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                            <div class="participant">Piano: Rayner</div>
+                            <div class="participant">Batería: Hernan</div>
+                            <div class="participant">Congas: Matew</div>
+                            <div class="participant">Guacharaca: Efrain</div>
+                            <div class="participant">Caja: Jeison B</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo AM</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Otoniel</strong></div>
+                            <div class="participant"><strong>Hellen C.</strong></div>
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant">Piano: Rayner</div>
+                            <div class="participant">Batería: Emanuel</div>
+                            <div class="participant">Congas: Efrain</div>
+                            <div class="participant">Guacharaca: Jhonatan B.</div>
+                            <div class="participant">Caja: Jeison B</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo PM</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Emanuel A.</strong></div>
+                            <div class="participant"><strong>Rosiris A.</strong></div>
+                            <div class="participant"><strong>Gisell D.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Hernan L</div>
+                            <div class="participant">Congas: Matew S.</div>
+                            <div class="participant">Guacharaca: Jose M.</div>
+                            <div class="participant">Caja: Jeison B.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semana 3 -->
+            <div class="week-section hidden" data-week="3">
+                <h2 class="week-title">
+                    <span class="week-number">3</span>
+                    <span>Tercera Semana (16-22 de Febrero)</span>
+                </h2>
+                <div class="days-grid">
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Martes</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Diana P.</strong></div>
+                            <div class="participant"><strong>Marelvis G.</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Jueves</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Diana P.</strong></div>
+                            <div class="participant"><strong>Yolismar J.</strong></div>
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Emanuel</div>
+                            <div class="participant">Congas: Efrain J.</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Sábado</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Juanfer B</strong></div>
+                            <div class="participant"><strong>Dany C.</strong></div>
+                            <div class="participant"><strong>Hellen C.</strong></div>
+                            <div class="participant"><strong>Rosiris A.</strong></div>
+                            <div class="participant">Piano: Rayner</div>
+                            <div class="participant">Batería: Emanuel</div>
+                            <div class="participant">Congas: Matew</div>
+                            <div class="participant">Caja: Jhonatan B.</div>
+                            <div class="participant">Guacharaca: Hernan</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo AM</div>
+                        <div class="day-subtitle">(Culto de Familia)</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant"><strong>Yolismar J.</strong></div>
+                            <div class="participant"><strong>Dany C.</strong></div>
+                            <div class="participant"><strong>Marelvis G.</strong></div>
+                            <div class="participant">Piano: Rayner</div>
+                            <div class="participant">Batería: Hernan</div>
+                            <div class="participant">Congas: Emanuel</div>
+                            <div class="participant">Guacharaca: Efrain</div>
+                            <div class="participant">Caja: Jeison B</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo PM</div>
+                        <div class="day-subtitle">(Libre de Familia)</div>
+                        <div class="participants">
+                            <div class="participant">---</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semana 4 -->
+            <div class="week-section hidden" data-week="4">
+                <h2 class="week-title">
+                    <span class="week-number">4</span>
+                    <span>Cuarta Semana (23 de Febrero al 01 de Marzo)</span>
+                </h2>
+                <div class="days-grid">
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Martes</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Jueves</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Fredy M.</strong></div>
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Marelvis G.</strong></div>
+                            <div class="participant"><strong>Hellen C.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Hernan L.</div>
+                            <div class="participant">Congas: Matew S.</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Sábado</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant"><strong>Fredy M.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Hernan L.</div>
+                            <div class="participant">Congas: Matew</div>
+                            <div class="participant">Caja: Efrain J.</div>
+                            <div class="participant">Guacharaca: Efrain J.</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo AM</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Juanfer B.</strong></div>
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Jennifer A.</strong></div>
+                            <div class="participant"><strong>Fredy M.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Emanuel A.</div>
+                            <div class="participant">Congas: Matew</div>
+                            <div class="participant">Caja: Efrain J.</div>
+                            <div class="participant">Guacharaca: Hernan L.</div>
+                        </div>
+                    </div>
+
+                    <div class="day-card" style="display: block;">
+                        <div class="day-name">Domingo PM</div>
+                        <div class="participants">
+                            <div class="participant"><strong>Naydith H.</strong></div>
+                            <div class="participant"><strong>Gisell D.</strong></div>
+                            <div class="participant"><strong>Fredy M.</strong></div>
+                            <div class="participant">Piano: Rayner C.</div>
+                            <div class="participant">Batería: Emanuel A.</div>
+                            <div class="participant">Congas: Matew</div>
+                            <div class="participant">Caja: Efrain J.</div>
+                            <div class="participant">Guacharaca: Hernan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="noResults" class="no-results hidden">
+            No se encontraron resultados para tu búsqueda 😔
+        </div>
+    </div>
+
+    <button class="download-btn" onclick="downloadHTML()">
+        <span>📥</span>
+        <span>Descargar para WhatsApp</span>
+    </button>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const content = document.getElementById('content');
+        const noResults = document.getElementById('noResults');
+        let currentWeekFilter = 'all';
+
+        searchInput.addEventListener('input', function(e) {
+            filterContent();
+        });
+
+        // Week filter buttons
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentWeekFilter = this.dataset.week;
+                filterContent();
+            });
+        });
+
+        function filterContent() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const weekSections = document.querySelectorAll('.week-section');
+            let hasVisibleContent = false;
+
+            weekSections.forEach(section => {
+                const weekNum = section.dataset.week;
+                let sectionHasVisible = false;
+
+                // Check week filter
+                if (currentWeekFilter !== 'all' && weekNum !== currentWeekFilter) {
+                    section.classList.add('hidden');
+                    return;
+                }
+
+                const dayCards = section.querySelectorAll('.day-card');
+                
+                dayCards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    if (searchTerm === '' || text.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        sectionHasVisible = true;
+                        hasVisibleContent = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                if (sectionHasVisible) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            if (hasVisibleContent) {
+                content.classList.remove('hidden');
+                noResults.classList.add('hidden');
+            } else {
+                content.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            }
+        }
+
+        // Download functionality
+        function downloadHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cronograma_devocionales_alabanza.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Show success message
+            const btn = document.querySelector('.download-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>✅</span><span>¡Descargado!</span>';
+            btn.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = 'linear-gradient(135deg, var(--accent), var(--accent-light))';
+            }, 2000);
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+
+</body></html>
